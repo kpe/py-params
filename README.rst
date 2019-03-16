@@ -10,7 +10,7 @@ A type safe dictionary class in python.
 LICENSE
 -------
 
-MIT. See `License File <https://github.com/kpe/params/blob/master/LICENSE.txt>`__.
+MIT. See `License File <https://github.com/kpe/params/blob/master/LICENSE.txt>`_.
 
 Install
 -------
@@ -25,7 +25,7 @@ Install
 Usage
 -----
 
-``Param`` instances are ``dict``s for which default values could be
+``Param`` instances are ``dict`` s for which default values could be
 provided as class level fields when subclassing `Params`.
 Those default values could than be overridden in instances of the class,
 by specifying the values in the constructor.
@@ -41,11 +41,11 @@ would raise an ``AttributeError``.
     ...     param_a = 'a'
     ...     param_b = True
 
-    >>> params=TestParams()                      # using defaults
+    >>> params=TestParams()                       ## using defaults
     >>> params
     {'param_a': 1, 'param_b': True}
 
-    >>> TestParams(param_a='c')                  # override param_a
+    >>> TestParams(param_a='c')                   ## override param_a
     {'param_a': 'c', 'param_b': True}
 
     >>> params.param_c
@@ -64,3 +64,4 @@ would raise an ``AttributeError``.
    :target: https://coveralls.io/r/kpe/params
 .. |Version Status| image:: https://badge.fury.io/py/py-params.svg
    :target: https://badge.fury.io/py/py-params
+
