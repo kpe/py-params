@@ -10,6 +10,10 @@ from setuptools import setup
 import params
 
 
+with open("README.rst", "r") as fh:
+    long_description = fh.read()
+
+
 setup(name='py-params',
       version=params.__version__,
       description='A type safe dictionary in python',
@@ -20,7 +24,8 @@ setup(name='py-params',
       keywords='dictionary utility parameters flags',
       packages=['params'],
       package_data={'params': ['tests/*.py']},
-      long_description=open('README.rst').read(),
+      long_description=long_description,
+      long_description_content_type="text/x-rst",
       zip_safe=False,
       python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
       classifiers=[

@@ -62,5 +62,5 @@ would raise an ``AttributeError``.
    :target: https://travis-ci.org/kpe/params
 .. |Coverage Status| image:: https://coveralls.io/repos/kpe/params/badge.svg?branch=master
    :target: https://coveralls.io/r/kpe/params
-.. |Version Status| image:: https://badge.fury.io/py/params.svg
-   :target: https://badge.fury.io/py/params
+.. |Version Status| image:: https://badge.fury.io/py/py-params.svg
+   :target: https://badge.fury.io/py/py-params
