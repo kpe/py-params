@@ -6,7 +6,6 @@
 from __future__ import division, absolute_import, print_function
 
 
-from typing import Mapping, Any, Tuple
 import json
 
 
@@ -68,7 +67,7 @@ class Params(dict):
         return cls._defaults
 
     @classmethod
-    def from_dict(cls, params: Mapping[str, Any]) -> Tuple[dict, Mapping[str, Any]]:
+    def from_dict(cls, params):
         """ Constructs from dict and returns unused dict items. """
 
         if not params:
