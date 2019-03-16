@@ -19,7 +19,7 @@ Install
 
 ::
 
-    pip install params
+    pip install py-params
 
 
 Usage

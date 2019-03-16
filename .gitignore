@@ -2,7 +2,7 @@
 .vscode
 **/__pycache__
 .venv*
-params.egg-info/
+py_params.egg-info/
 dist
 build
 

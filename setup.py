@@ -10,7 +10,7 @@ from setuptools import setup
 import params
 
 
-setup(name='params',
+setup(name='py-params',
       version=params.__version__,
       description='A type safe dictionary in python',
       url='https://github.com/kpe/params/',
