@@ -40,7 +40,7 @@ script:
 after_success:
     - 'echo travis-python: $TRAVIS_PYTHON_VERSION'
     - 'echo coveralls: $COVERALLS_REPO_TOKEN'
-    - if [[ $TRAVIS_PYTHON_VERSION != pypy* ]]; then pip install coveralls --use-mirrors ; COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN coveralls ; fi
+    - if [[ $TRAVIS_PYTHON_VERSION != pypy* ]]; then pip install coveralls; COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN coveralls ; fi
 
 notifications:
   email: false
