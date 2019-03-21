@@ -59,6 +59,24 @@ class ParamsConstructionTest(unittest.TestCase):
         except AttributeError:
             pass
 
+    def test_from_dict(self):
+        params_dict = {'param_a': 3,
+                       'param_b': 4,
+                       'param_c': 5}
+        params, other = MyParams.from_dict(params_dict)
+        self.assertEqual({'param_a': 3, 'param_b': 4}, params)
+        self.assertEqual({'param_c': 5}, other)
+        self.assertIsInstance(params, MyParams)
+        self.assertIsInstance(other, dict)
+
+        params = MyParams.from_dict(params_dict, return_unused=False)
+        self.assertEqual({'param_a': 3, 'param_b': 4}, params)
+        self.assertIsInstance(params, MyParams)
+
+        params = MyParams.from_dict(params_dict, return_unused=False, return_instance=False)
+        self.assertEqual({'param_a': 3, 'param_b': 4}, params)
+        self.assertIsInstance(params, dict)
+
 
 if __name__ == '__main__':
     unittest.main()

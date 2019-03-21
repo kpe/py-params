@@ -5,7 +5,6 @@
 
 from __future__ import division, absolute_import, print_function
 
-
 import json
 
 
@@ -67,25 +66,34 @@ class Params(dict):
         return cls._defaults
 
     @classmethod
-    def from_dict(cls, params):
-        """ Constructs from dict and returns unused dict items. """
+    def from_dict(cls, args: dict, return_instance=True, return_unused=True):
+        """ Constructs from given ``args`` dict and returns the unused ``args``.
 
-        if not params:
-            return cls(), {}   # use default constructor
-
-        # extract unused args
-        keys = cls.defaults().keys()
-        cls_args, rest_args = zip(*list(map(lambda p: (p, None) if p[0] in keys else (None, p),
-                                            params.items())))
+        :param args: keyword dictionary with parameters
+        :param return_instance: False to return a dictionary instead of a Params instance.
+        :param return_unused: True to return the arguments not valid for the current class.
+        :return: a tuple (params, other) of params and a dict of unused arguments,
+                 where params is either a dict or a Params instance (where ``return_instance=True``).
+        """
 
         def is_not_none(x):
             return x is not None
 
-        cls_args  = dict(filter(is_not_none, cls_args))
-        rest_args = dict(filter(is_not_none, rest_args))
+        cls_args, unused_args = {}, {}
+        if args:
+            # extract unused args
+            keys = cls.defaults().keys()
+            cls_args, unused_args = zip(*list(map(lambda p: (p, None) if p[0] in keys else (None, p),
+                                                  args.items())))
 
-        instance = cls(**dict(cls_args))
-        return instance, rest_args
+            cls_args    = dict(filter(is_not_none, cls_args))
+            unused_args = dict(filter(is_not_none, unused_args))
+
+        params = cls(**cls_args) if return_instance else cls_args
+
+        if return_unused:
+            return params, unused_args
+        return params
 
     #
     # serialization
