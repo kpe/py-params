@@ -66,7 +66,7 @@ class Params(dict):
         return cls._defaults
 
     @classmethod
-    def from_dict(cls, args: dict, return_instance=True, return_unused=True):
+    def from_dict(cls, args, return_instance=True, return_unused=True):
         """ Constructs from given ``args`` dict and returns the unused ``args``.
 
         :param args: keyword dictionary with parameters
