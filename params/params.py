@@ -27,9 +27,10 @@ class Params(dict):
             params = MyParams(another_param=2.0)  # raises ValueError
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(Params, self).__init__()
         self.update(self.__class__.defaults())
+        self.update(dict(*args))
         self.update(kwargs)
 
     def __getattribute__(self, attr):

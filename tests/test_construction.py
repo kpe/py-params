@@ -77,6 +77,16 @@ class ParamsConstructionTest(unittest.TestCase):
         self.assertEqual({'param_a': 3, 'param_b': 4}, params)
         self.assertIsInstance(params, dict)
 
+    def test_construct_dict(self):
+        params = MyParams(param_a=99)
+        self.assertEqual(99, params.param_a)
+        params = MyParams(params, param_b=101)
+        self.assertEqual(99, params.param_a)
+        self.assertEqual(101, params.param_b)
+        params = MyParams(params, param_a=101)
+        self.assertEqual(101, params.param_a)
+        self.assertEqual(101, params.param_b)
+
 
 if __name__ == '__main__':
     unittest.main()
