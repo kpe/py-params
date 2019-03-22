@@ -72,6 +72,9 @@ class Params(dict):
 
         :param args: keyword dictionary with parameters
         :param return_instance: False to return a dictionary instead of a Params instance.
+               **N.B.** the `dict` returned by `MyParams.from_dict(return_instance=False))`
+               does not include the `MyParams` default params (unlike an instance
+               created with `return_instance=True`).
         :param return_unused: True to return the arguments not valid for the current class.
         :return: a tuple (params, other) of params and a dict of unused arguments,
                  where params is either a dict or a Params instance (where ``return_instance=True``).
