@@ -18,7 +18,7 @@ class MyParams(Params):
 class ParamsConstructionTest(unittest.TestCase):
     def test_defaults(self):
         expected = {'param_a': True, 'param_b': 1}
-        self.assertEqual(expected, MyParams.defaults())
+        self.assertEqual(expected, dict(MyParams()))
 
         params = MyParams()
         self.assertEqual(expected, dict(params))

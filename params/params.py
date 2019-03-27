@@ -29,12 +29,12 @@ class Params(dict):
 
     def __init__(self, *args, **kwargs):
         super(Params, self).__init__()
-        self.update(self.__class__.defaults())
+        self.update(self._defaults())
         self.update(dict(*args))
         self.update(kwargs)
 
     def __getattribute__(self, attr):
-        if attr != 'defaults' and attr in self.defaults():
+        if not attr.startswith("_") and attr in self._defaults():
             return self.__getitem__(attr)
         return object.__getattribute__(self, attr)
 
@@ -42,29 +42,30 @@ class Params(dict):
         self.__setitem__(key, value)
 
     def __setitem__(self, key, value):
-        if key not in self.defaults():
+        if key not in self._defaults():
             raise AttributeError("Setting unexpected parameter '{}' "
                                  "in Params instance '{}'".format(key, self.__class__.__name__))
         super(Params, self).__setitem__(key, value)
 
     @classmethod
-    def defaults(cls):
+    def _defaults(cls):
         """ Aggregate all class fields in the class hierarchy to a dict. """
 
-        if '_defaults' in cls.__dict__:
-            return cls.__dict__['_defaults']
+        if '__defaults' in cls.__dict__:
+            return cls.__defaults
 
         result = {}
         for base in cls.__bases__:
             if issubclass(base, Params):
-                result.update(base.defaults())
+                result.update(base._defaults())
 
-        result.update(dict(filter(lambda t: (not t[0].startswith('_') and
-                                             not callable(getattr(cls, t[0]))),
-                                  cls.__dict__.items())))
+        for attr, value in cls.__dict__.items():
+            if attr.startswith("_") or callable(getattr(cls, attr)):
+                continue
+            result[attr] = value
 
-        cls._defaults = result
-        return cls._defaults
+        cls.__defaults = result
+        return cls.__defaults
 
     @classmethod
     def from_dict(cls, args, return_instance=True, return_unused=True):
@@ -86,7 +87,7 @@ class Params(dict):
         cls_args, unused_args = {}, {}
         if args:
             # extract unused args
-            keys = cls.defaults().keys()
+            keys = cls._defaults().keys()
             cls_args, unused_args = zip(*list(map(lambda p: (p, None) if p[0] in keys else (None, p),
                                                   args.items())))
 
