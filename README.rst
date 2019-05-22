@@ -10,7 +10,7 @@ A type safe dictionary class in python.
 LICENSE
 -------
 
-MIT. See `License File <https://github.com/kpe/params/blob/master/LICENSE.txt>`_.
+MIT. See `License File <https://github.com/kpe/py-params/blob/master/LICENSE.txt>`_.
 
 Install
 -------
@@ -58,10 +58,10 @@ would raise an ``AttributeError``.
     {'param_a': 3, 'param_b': True}
 
 
-.. |Build Status| image:: https://travis-ci.org/kpe/params.svg?branch=master
-   :target: https://travis-ci.org/kpe/params
-.. |Coverage Status| image:: https://coveralls.io/repos/kpe/params/badge.svg?branch=master
-   :target: https://coveralls.io/r/kpe/params
+.. |Build Status| image:: https://travis-ci.org/kpe/py-params.svg?branch=master
+   :target: https://travis-ci.org/kpe/py-params
+.. |Coverage Status| image:: https://coveralls.io/repos/kpe/py-params/badge.svg?branch=master
+   :target: https://coveralls.io/r/kpe/py-params
 .. |Version Status| image:: https://badge.fury.io/py/py-params.svg
    :target: https://badge.fury.io/py/py-params
 

@@ -17,7 +17,7 @@ with open("README.rst", "r") as fh:
 setup(name='py-params',
       version=params.__version__,
       description='A type safe dictionary in python',
-      url='https://github.com/kpe/params/',
+      url='https://github.com/kpe/py-params/',
       author='kpe',
       author_email='kpe.git@gmailbox.org',
       license='MIT',
