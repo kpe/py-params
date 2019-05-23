@@ -4,18 +4,17 @@
 # created by kpe on 16.03.2019 at 1:26 AM
 #
 
-
 from setuptools import setup, find_packages
-
-import params
 
 
 with open("README.rst", "r") as fh:
     long_description = fh.read()
 
+with open("version", "r") as fh:
+    __version__ = fh.read().strip()
 
 setup(name="py-params",
-      version=params.__version__,
+      version=__version__,
       url="https://github.com/kpe/py-params/",
       description="A type safe dictionary in python",
       long_description=long_description,
@@ -26,8 +25,7 @@ setup(name="py-params",
       author_email="kpe.git@gmailbox.org",
       packages=find_packages(exclude=["tests"]),
 
-      package_data={"": ["*.txt", "*.rst"],
-                    "params": ["'tests/*.py"]},
+      include_package_data=True,
       zip_safe=True,
       python_requires=">=3.4",
       classifiers=[
