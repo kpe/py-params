@@ -5,7 +5,7 @@
 #
 
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 import params
 
@@ -14,26 +14,26 @@ with open("README.rst", "r") as fh:
     long_description = fh.read()
 
 
-setup(name='py-params',
+setup(name="py-params",
       version=params.__version__,
-      description='A type safe dictionary in python',
-      url='https://github.com/kpe/py-params/',
-      author='kpe',
-      author_email='kpe.git@gmailbox.org',
-      license='MIT',
-      keywords='dictionary utility parameters flags',
-      packages=['params'],
-      package_data={'params': ['tests/*.py']},
+      url="https://github.com/kpe/py-params/",
+      description="A type safe dictionary in python",
       long_description=long_description,
       long_description_content_type="text/x-rst",
-      zip_safe=False,
-      python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
+      keywords="dict dictionary utility parameters flags arguments",
+      license="MIT",
+      author="kpe",
+      author_email="kpe.git@gmailbox.org",
+      packages=find_packages(exclude=["tests"]),
+
+      package_data={"": ["*.txt", "*.rst"],
+                    "params": ["'tests/*.py"]},
+      zip_safe=True,
+      python_requires=">=3.4",
       classifiers=[
           "Development Status :: 5 - Production/Stable",
           "License :: OSI Approved :: MIT License",
           "Programming Language :: Python",
-          "Programming Language :: Python :: 2",
-          "Programming Language :: Python :: 2.7",
           "Programming Language :: Python :: 3",
           "Programming Language :: Python :: 3.4",
           "Programming Language :: Python :: 3.5",
