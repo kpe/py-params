@@ -26,7 +26,7 @@ setup(name="py-params",
       packages=find_packages(exclude=["tests"]),
 
       include_package_data=True,
-      zip_safe=True,
+      zip_safe=False,
       python_requires=">=3.4",
       classifiers=[
           "Development Status :: 5 - Production/Stable",
