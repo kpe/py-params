@@ -2,7 +2,7 @@
 Params
 ======
 
-|Build Status| |Coverage Status| |Version Status|
+|Build Status| |Coverage Status| |Version Status| |Python Versions|
 
 A type safe dictionary class in python.
 
@@ -70,6 +70,7 @@ would raise an ``AttributeError``.
    :target: https://coveralls.io/r/kpe/py-params
 .. |Version Status| image:: https://badge.fury.io/py/py-params.svg
    :target: https://badge.fury.io/py/py-params
+.. |Python Versions| image:: https://img.shields.io/pypi/pyversions/py-params.svg
 
 Resources
 ---------
