@@ -3,6 +3,6 @@
 # created by kpe on 16.03.2019 at 1:05 AM
 #
 
-from .params import Params
+from params.params import Params
 
-__version__ = '0.6.0'
+__version__ = '0.6.1'
