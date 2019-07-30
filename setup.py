@@ -4,14 +4,21 @@
 # created by kpe on 16.03.2019 at 1:26 AM
 #
 
-from setuptools import setup, find_packages
-
+from setuptools import setup, find_packages, convert_path
 
 with open("README.rst", "r") as fh:
     long_description = fh.read()
 
-with open("version", "r") as fh:
-    __version__ = fh.read().strip()
+
+def _version():
+    ns = {}
+    with open(convert_path("params/version.py"), "r") as fh:
+        exec(fh.read(), ns)
+    return ns['__version__']
+
+
+__version__ = _version()
+
 
 setup(name="py-params",
       version=__version__,
