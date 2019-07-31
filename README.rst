@@ -2,7 +2,7 @@
 Params
 ======
 
-|Build Status| |Coverage Status| |Version Status| |Python Versions|
+|Build Status| |Coverage Status| |Version Status| |Python Versions| |Downloads|
 
 A type safe dictionary class in python.
 
@@ -71,6 +71,7 @@ would raise an ``AttributeError``.
 .. |Version Status| image:: https://badge.fury.io/py/py-params.svg
    :target: https://badge.fury.io/py/py-params
 .. |Python Versions| image:: https://img.shields.io/pypi/pyversions/py-params.svg
+.. |Downloads| image:: https://img.shields.io/pypi/dm/py-params.svg
 
 Resources
 ---------
