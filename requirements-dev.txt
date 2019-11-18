@@ -2,4 +2,4 @@ coverage
 docutils
 nose
 Pygments
-pep8
+pycodestyle
