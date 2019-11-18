@@ -6,6 +6,7 @@
 from __future__ import division, absolute_import, print_function
 
 import unittest
+import tempfile
 
 from params import Params
 
@@ -31,6 +32,28 @@ class ParamsSerializationTest(unittest.TestCase):
     def test_json(self):
         params = SomeParams.from_json_string(SomeParams().to_json_string())
         self.assertEqual(params, {'param_a': 1})
+
+    def test_to_json_file(self):
+        params = SomeParams.from_json_string(SomeParams().to_json_string())
+        with tempfile.NamedTemporaryFile("w") as tf:
+            tf.close()
+            file_name = params.to_json_file(tf.name)
+            self.assertIsNotNone(file_name)
+            dparams = SomeParams.from_json_file(file_name)
+            self.assertEqual(params, dparams)
+
+    def test_to_json_file_fail(self):
+        params = SomeParams.from_json_string(SomeParams().to_json_string())
+        try:
+            params.to_json_file("/proc/test")
+            self.fail()
+        except:
+            pass
+        try:
+            SomeParams.from_json_file("/proc/test")
+            self.fail()
+        except:
+            pass
 
 
 if __name__ == '__main__':

@@ -113,11 +113,25 @@ class Params(dict):
         """ Deserializes this instance from a JSON string."""
         return cls(**json.loads(json_string))
 
-    '''
     @classmethod
     def from_json_file(cls, json_file):
-        """Constructs a `BertConfig` from a json file of parameters."""
-        with tf.gfile.GFile(json_file, "r") as reader:
-            text = reader.read()
-        return cls(**json.loads(text))
-    '''
+        """Constructs an instance from a json file."""
+        import tensorflow as tf
+        try:
+            with tf.io.gfile.GFile(json_file, "r") as reader:
+                text = reader.read()
+            return cls(**json.loads(text))
+        except Exception as err:
+            print("Failed to read {} instance from: {}".format(cls.__name__, json_file))
+            return None
+
+    def to_json_file(self, file_path):
+        """Writes the instance to a json file."""
+        import tensorflow as tf
+        try:
+            with tf.io.gfile.GFile(file_path, "w") as fp:
+                json.dump(self, fp)
+            return file_path
+        except Exception as err:
+            print("Failed to write {} instance to: {}".format(self.__class__.__name__, file_path))
+            return None
