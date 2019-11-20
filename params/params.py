@@ -125,12 +125,12 @@ class Params(dict):
             print("Failed to read {} instance from: {}".format(cls.__name__, json_file))
             return None
 
-    def to_json_file(self, file_path):
+    def to_json_file(self, file_path, **kwargs):
         """Writes the instance to a json file."""
         import tensorflow as tf
         try:
             with tf.io.gfile.GFile(file_path, "w") as fp:
-                json.dump(self, fp)
+                json.dump(self, fp, **kwargs)
             return file_path
         except Exception as err:
             print("Failed to write {} instance to: {}".format(self.__class__.__name__, file_path))
