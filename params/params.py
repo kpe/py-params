@@ -133,7 +133,7 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
         try:
             import tensorflow as tf
             open_file = tf.io.gfile.GFile  # pragma: no cover
-        except Exception:
+        except Exception:                  # pragma: no cover
             open_file = open
 
         try:
@@ -149,7 +149,7 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
         try:
             import tensorflow as tf
             open_file = tf.io.gfile.GFile  # pragma: no cover
-        except Exception:
+        except Exception:                  # pragma: no cover
             open_file = open
 
         try:
