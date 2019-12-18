@@ -87,6 +87,22 @@ class ParamsConstructionTest(unittest.TestCase):
         self.assertEqual(101, params.param_a)
         self.assertEqual(101, params.param_b)
 
+    def test_field_mutability(self):
+        params = MyParams(param_a=1)
+        try:
+            params = MyParams(param_c=3)
+            self.fail("Setting param_c should not be possible")
+        except AttributeError as ex:
+            pass
+
+        try:
+            params.update(param_c=3)
+            self.fail("Setting param_c should not be possible")
+        except AttributeError as ex:
+            pass
+        params.update({"param_a": 3})
+        params.update([("param_a", 4)])
+
 
 if __name__ == '__main__':
     unittest.main()

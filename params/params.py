@@ -6,9 +6,11 @@
 from __future__ import division, absolute_import, print_function
 
 import json
+import types
+import inspect
 
 
-class Params(dict):
+class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
     """ Base class for defining safe parameter dictionaries.
 
     Example:
@@ -32,6 +34,18 @@ class Params(dict):
         self.update(self.__defaults())
         self.update(dict(*args))
         self.update(kwargs)
+
+    def update(self, arg=None, **kwargs):
+        if arg:
+            keys = getattr(arg, "keys") if hasattr(arg, "keys") else None
+            if keys and (inspect.ismethod(keys) or inspect.isbuiltin(keys)):
+                for key in arg:
+                    self[key] = arg[key]
+            else:
+                for key, v in arg:
+                    self[key] = v
+        for key in kwargs:
+            self[key] = kwargs[key]
 
     def __getattribute__(self, attr):
         if not attr.startswith("_") and attr in self.__defaults():
@@ -116,9 +130,14 @@ class Params(dict):
     @classmethod
     def from_json_file(cls, json_file):
         """Constructs an instance from a json file."""
-        import tensorflow as tf
         try:
-            with tf.io.gfile.GFile(json_file, "r") as reader:
+            import tensorflow as tf
+            open_file = tf.io.gfile.GFile  # pragma: no cover
+        except Exception:
+            open_file = open
+
+        try:
+            with open_file(json_file, "r") as reader:
                 text = reader.read()
             return cls(**json.loads(text))
         except Exception as err:
@@ -127,9 +146,14 @@ class Params(dict):
 
     def to_json_file(self, file_path, **kwargs):
         """Writes the instance to a json file."""
-        import tensorflow as tf
         try:
-            with tf.io.gfile.GFile(file_path, "w") as fp:
+            import tensorflow as tf
+            open_file = tf.io.gfile.GFile  # pragma: no cover
+        except Exception:
+            open_file = open
+
+        try:
+            with open_file(file_path, "w") as fp:
                 json.dump(self, fp, **kwargs)
             return file_path
         except Exception as err:
