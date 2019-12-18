@@ -123,12 +123,18 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
         return json.dumps(dict(self), indent=2, sort_keys=True) + "\n"
 
     @classmethod
-    def from_json_string(cls, json_string):
-        """ Deserializes this instance from a JSON string."""
-        return cls(**json.loads(json_string))
+    def from_json_string(cls, json_string, check_params=False):
+        """ Deserializes this instance from a JSON string.
+        :param check_params: whether to throw an exception when
+        json_string contains params not compatible with the current instance.
+        """
+        if check_params:
+            return cls(**json.loads(json_string))
+        else:
+            return cls.from_dict(json.loads(json_string), return_instance=True, return_unused=False)
 
     @classmethod
-    def from_json_file(cls, json_file):
+    def from_json_file(cls, json_file, check_params=False):
         """Constructs an instance from a json file."""
         try:
             import tensorflow as tf
@@ -139,7 +145,7 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
         try:
             with open_file(json_file, "r") as reader:
                 text = reader.read()
-            return cls(**json.loads(text))
+            return cls.from_json_string(text, check_params=check_params)
         except Exception as err:
             print("Failed to read {} instance from: {}".format(cls.__name__, json_file))
             return None

@@ -41,6 +41,8 @@ class ParamsSerializationTest(unittest.TestCase):
             self.assertIsNotNone(file_name)
             dparams = SomeParams.from_json_file(file_name)
             self.assertEqual(params, dparams)
+            dparams = SomeParams.from_json_file(file_name, check_params=True)
+            self.assertEqual(params, dparams)
 
     def test_to_json_file_fail(self):
         params = SomeParams.from_json_string(SomeParams().to_json_string())
