@@ -40,6 +40,10 @@ class ParamsSubclassingTest(unittest.TestCase):
         except AttributeError:
             pass
 
+        params = SubParams(param_b=2).clone(param_c=3)
+        expected = {'param_b': 2, 'param_a': False, 'param_c': 3}
+        self.assertEqual(dict(params), expected)
+
 
 if __name__ == '__main__':
     unittest.main()

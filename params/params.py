@@ -165,3 +165,12 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
         except Exception as err:
             print("Failed to write {} instance to: {}".format(self.__class__.__name__, file_path))
             return None
+
+    def clone(self, **kwargs):
+        """
+        Creates a clone.
+        :param kwargs: parameters to override in the clone.
+        """
+        args = dict(self)
+        args.update(**kwargs)
+        return self.__class__(**args)
