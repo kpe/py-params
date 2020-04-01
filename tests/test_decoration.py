@@ -55,13 +55,13 @@ class ParamsDecorationTest(unittest.TestCase):
         try:
             args = parser.parse_args(["--use-other-things", "f"])
             self.fail("ArgumentError expected - required param missing")
-        except Exception as err:
+        except Exception:
             pass
 
         try:
             args = parser.parse_args(["--use-other-things", "1e-6", "--number-of-things", "3"])
             self.fail("ArgumentTypeError expected")
-        except Exception as err:
+        except Exception:
             pass
 
 

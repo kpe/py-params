@@ -36,7 +36,8 @@ class Param:
         self.required = required
         self.dtype = type(value) if (dtype is None and value is not None) else dtype
         if value is not None:
-            assert isinstance(value, self.dtype)
+            if not isinstance(value, self.dtype):
+                raise RuntimeError(f"Param({value}) does not match dtype:[{self.dtype}]")
         self.name = None
 
 
