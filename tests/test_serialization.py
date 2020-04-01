@@ -49,12 +49,12 @@ class ParamsSerializationTest(unittest.TestCase):
         try:
             params.to_json_file("/proc/test")
             self.fail()
-        except:
+        except Exception:
             pass
         try:
             SomeParams.from_json_file("/proc/test")
             self.fail()
-        except:
+        except Exception:
             pass
 
 

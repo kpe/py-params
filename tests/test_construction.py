@@ -92,13 +92,13 @@ class ParamsConstructionTest(unittest.TestCase):
         try:
             params = MyParams(param_c=3)
             self.fail("Setting param_c should not be possible")
-        except AttributeError as ex:
+        except AttributeError:
             pass
 
         try:
             params.update(param_c=3)
             self.fail("Setting param_c should not be possible")
-        except AttributeError as ex:
+        except AttributeError:
             pass
         params.update({"param_a": 3})
         params.update([("param_a", 4)])

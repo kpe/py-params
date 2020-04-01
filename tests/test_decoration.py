@@ -7,7 +7,6 @@ from __future__ import division, absolute_import, print_function
 
 import unittest
 
-import argparse
 import params as pp
 
 

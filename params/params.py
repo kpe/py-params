@@ -36,7 +36,7 @@ class Param:
         self.required = required
         self.dtype = type(value) if (dtype is None and value is not None) else dtype
         if value is not None:
-            assert type(value) == self.dtype
+            assert isinstance(value, self.dtype)
         self.name = None
 
 
