@@ -12,7 +12,7 @@ matrix:
       sudo: true
 
 env:
-    - PEP8_IGNORE="E221,E501,W504"
+    - PEP8_IGNORE="E221,E501,W504,E203"
 
 # command to install dependencies
 install:
