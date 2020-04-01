@@ -59,6 +59,13 @@ class ParamsDecorationTest(unittest.TestCase):
             pass
 
         try:
+            class AParams(pp.Params):
+                parm = pp.Param(2, dtype=bool)
+            self.fail("RuntimeError expected - type mismatch")
+        except Exception:
+            pass
+
+        try:
             args = parser.parse_args(["--use-other-things", "1e-6", "--number-of-things", "3"])
             self.fail("ArgumentTypeError expected")
         except Exception:
