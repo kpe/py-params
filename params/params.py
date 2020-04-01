@@ -61,8 +61,8 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
             params = MyParams(another_param=2.0)  # raises ValueError
     """
 
-    __specs    = {}  # : Dict[Text, Param] = {}
-    __defaults = {}  # : Dict[Text, Any]   = {}
+    __specs    : Dict[Text, Param] = {}
+    __defaults : Dict[Text, Any]   = {}
 
     def __init_subclass__(cls, **kwargs):
         """ Aggregates the Param spec of the parameters over the hierarchy. """
