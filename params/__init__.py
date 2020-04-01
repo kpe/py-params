@@ -5,4 +5,4 @@
 
 from .version import __version__
 
-from .params import Params
+from .params import Params, Param

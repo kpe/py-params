@@ -6,8 +6,38 @@
 from __future__ import division, absolute_import, print_function
 
 import json
-import types
 import inspect
+from typing import Text, Type, Any, Dict
+
+import argparse
+
+
+class Param:
+    """ Provides a parameter specification to be used within a Params instance. """
+    def __init__(self, value, doc: Text = None, dtype: Type = None, required: bool = False):
+        """
+        Constructs a parameter specification to be used in a Params instance:
+
+        Example:
+
+            import params ass pp
+
+            class MyParams(pp.Params):
+                some_parameter    = pp.Param(0.9, doc="some description for the some_parameter parameter")
+                another_parameter = 1
+
+        :param value: default value for the parameter
+        :param doc: (Optional) document string
+        :param dtype: (Optional) type
+        :param required:  default is True.
+        """
+        self.default_value = value
+        self.doc_string = doc
+        self.required = required
+        self.dtype = type(value) if (dtype is None and value is not None) else dtype
+        if value is not None:
+            assert type(value) == self.dtype
+        self.name = None
 
 
 class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
@@ -17,7 +47,9 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
        Use by defining default parameter values as class variables,
        and then use or update the instance variables like this::
 
-            class MyParams(Params):
+            import params as pp
+
+            class MyParams(pp.Params):
                 my_param = 1.0               # defaults to 1.0
 
             params = MyParams(my_param=2.0)           # override defaults
@@ -29,11 +61,38 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
             params = MyParams(another_param=2.0)  # raises ValueError
     """
 
+    __specs    = {}  # : Dict[Text, Param] = {}
+    __defaults = {}  # : Dict[Text, Any]   = {}
+
+    def __init_subclass__(cls, **kwargs):
+        """ Aggregates the Param spec of the parameters over the hierarchy. """
+        specs = {}
+        for base in reversed(cls.__bases__):
+            if issubclass(base, Params):
+                specs.update(base.__specs)
+
+            for attr, value in cls.__dict__.items():
+                if attr.startswith("_") or callable(getattr(cls, attr)):
+                    continue
+                if isinstance(value, property):
+                    continue
+                param_spec = value
+                if not isinstance(param_spec, Param):
+                    param_spec = Param(value)
+                param_spec.name = attr
+                specs[attr] = param_spec
+
+            for attr, value in specs.items():
+                setattr(cls, attr, value.default_value)
+
+        cls.__specs = specs
+        cls.__defaults = {key: val.default_value for key, val in cls.__specs.items()}
+
     def __init__(self, *args, **kwargs):
         super(Params, self).__init__()
-        self.update(self.__defaults())
-        self.update(dict(*args))
-        self.update(kwargs)
+        self.update(self.__defaults)   # start with default values
+        self.update(dict(*args))       # override with tuple list
+        self.update(kwargs)            # override with kwargs
 
     def update(self, arg=None, **kwargs):
         if arg:
@@ -48,7 +107,7 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
             self[key] = kwargs[key]
 
     def __getattribute__(self, attr):
-        if not attr.startswith("_") and attr in self.__defaults():
+        if not attr.startswith("_") and attr in self.__defaults:
             return self.__getitem__(attr)
         return object.__getattribute__(self, attr)
 
@@ -56,30 +115,10 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
         self.__setitem__(key, value)
 
     def __setitem__(self, key, value):
-        if key not in self.__defaults():
+        if key not in self.__defaults:
             raise AttributeError("Setting unexpected parameter '{}' "
                                  "in Params instance '{}'".format(key, self.__class__.__name__))
         super(Params, self).__setitem__(key, value)
-
-    @classmethod
-    def __defaults(cls):
-        """ Aggregate all class fields in the class hierarchy to a dict. """
-
-        if '_defaults' in cls.__dict__:
-            return cls._defaults
-
-        result = {}
-        for base in cls.__bases__:
-            if issubclass(base, Params):
-                result.update(base.__defaults())
-
-        for attr, value in cls.__dict__.items():
-            if attr.startswith("_") or callable(getattr(cls, attr)):
-                continue
-            result[attr] = value
-
-        cls._defaults = result
-        return cls._defaults
 
     @classmethod
     def from_dict(cls, args, return_instance=True, return_unused=True):
@@ -101,7 +140,7 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
         cls_args, unused_args = {}, {}
         if args:
             # extract unused args
-            keys = cls.__defaults().keys()
+            keys = cls.__defaults.keys()
             cls_args, unused_args = zip(*list(map(lambda p: (p, None) if p[0] in keys else (None, p),
                                                   args.items())))
 
@@ -123,10 +162,11 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
         return json.dumps(dict(self), indent=2, sort_keys=True) + "\n"
 
     @classmethod
-    def from_json_string(cls, json_string, check_params=False):
+    def from_json_string(cls, json_string: Text, check_params=False):
         """ Deserializes this instance from a JSON string.
+        :param json_string: a JSON string to parse
         :param check_params: whether to throw an exception when
-        json_string contains params not compatible with the current instance.
+               json_string contains params not compatible with the current instance.
         """
         if check_params:
             return cls(**json.loads(json_string))
@@ -147,7 +187,7 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
                 text = reader.read()
             return cls.from_json_string(text, check_params=check_params)
         except Exception as err:
-            print("Failed to read {} instance from: {}".format(cls.__name__, json_file))
+            print("Failed to read {} instance from: {}".format(cls.__name__, json_file), err)
             return None
 
     def to_json_file(self, file_path, **kwargs):
@@ -163,7 +203,7 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
                 json.dump(self, fp, **kwargs)
             return file_path
         except Exception as err:
-            print("Failed to write {} instance to: {}".format(self.__class__.__name__, file_path))
+            print("Failed to write {} instance to: {}".format(self.__class__.__name__, file_path), err)
             return None
 
     def clone(self, **kwargs):
@@ -174,3 +214,38 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
         args = dict(self)
         args.update(**kwargs)
         return self.__class__(**args)
+
+    @classmethod
+    def to_argument_parser(cls) -> argparse.ArgumentParser:
+        def arg_name(param_name: Text):
+            result = param_name.lower().replace("_", "-")
+            return result
+
+        parser = argparse.ArgumentParser()
+        for attr, spec in cls.__specs.items():
+            if spec.doc_string is None:
+                continue
+            name = arg_name(spec.name)
+            add_argument_args = {
+                "type": spec.dtype,
+                "required": spec.required,
+                "help": spec.doc_string,
+                "default": spec.default_value
+            }
+            if spec.dtype == bool:
+                add_argument_args.update({
+                    "type": _str2bool, "nargs": "?", "const": True
+                })
+            parser.add_argument("--{}".format(name), **add_argument_args)
+        return parser
+
+
+def _str2bool(v: Text) -> bool:
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')

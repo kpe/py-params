@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PEP8_IGNORE=E221,E501,W504,W391
+PEP8_IGNORE=E221,E501,W504,W391,E203
 
 pycodestyle --ignore=${PEP8_IGNORE} --exclude=tests,.venv -r --show-source tests params
 
