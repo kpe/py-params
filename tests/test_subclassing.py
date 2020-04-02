@@ -19,6 +19,20 @@ class SubParams(BaseParams):
     param_c = 'a'
     param_a = False
 
+class SubParamsA(SubParams):
+    param_d = 'A'
+    param_e = False
+
+class SubParamsB(SubParams):
+    param_f = 'B'
+    param_g = False
+
+class MySubParams(SubParamsA, SubParamsB):
+    param_h = 'a'
+    param_j = False
+
+
+
 
 class ParamsSubclassingTest(unittest.TestCase):
     def test_subclassing(self):
@@ -44,6 +58,11 @@ class ParamsSubclassingTest(unittest.TestCase):
         expected = {'param_b': 2, 'param_a': False, 'param_c': 3}
         self.assertEqual(dict(params), expected)
 
+    def test_hierarchy(self):
+        params = MySubParams()
+        self.assertEqual(params.param_b, 1)
+        self.assertEqual(params.param_a, False)
+        MySubParams.to_argument_parser().print_help()
 
 if __name__ == '__main__':
     unittest.main()

@@ -72,19 +72,19 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
             if issubclass(base, Params):
                 specs.update(base.__specs)
 
-            for attr, value in cls.__dict__.items():
-                if attr.startswith("_") or callable(getattr(cls, attr)):
-                    continue
-                if isinstance(value, property):
-                    continue
-                param_spec = value
-                if not isinstance(param_spec, Param):
-                    param_spec = Param(value)
-                param_spec.name = attr
-                specs[attr] = param_spec
+        for attr, value in cls.__dict__.items():
+            if attr.startswith("_") or callable(getattr(cls, attr)):
+                continue
+            if isinstance(value, property):
+                continue
+            param_spec = value
+            if not isinstance(param_spec, Param):
+                param_spec = Param(value)
+            param_spec.name = attr
+            specs[attr] = param_spec
 
-            for attr, value in specs.items():
-                setattr(cls, attr, value.default_value)
+        for attr, value in specs.items():
+            setattr(cls, attr, value.default_value)
 
         cls.__specs = specs
         cls.__defaults = {key: val.default_value for key, val in cls.__specs.items()}
