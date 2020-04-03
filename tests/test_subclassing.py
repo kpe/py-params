@@ -19,19 +19,24 @@ class SubParams(BaseParams):
     param_c = 'a'
     param_a = False
 
+
 class SubParamsA(SubParams):
     param_d = 'A'
     param_e = False
+
 
 class SubParamsB(SubParams):
     param_f = 'B'
     param_g = False
 
+
 class MySubParams(SubParamsA, SubParamsB):
     param_h = 'a'
     param_j = False
 
-
+    @property
+    def param_f(self):
+        return 'F'
 
 
 class ParamsSubclassingTest(unittest.TestCase):
@@ -63,6 +68,9 @@ class ParamsSubclassingTest(unittest.TestCase):
         self.assertEqual(params.param_b, 1)
         self.assertEqual(params.param_a, False)
         MySubParams.to_argument_parser().print_help()
+
+        self.assertEqual(params.param_f, "F")
+        self.assertEqual(MySubParams.param_f, "F")
 
 if __name__ == '__main__':
     unittest.main()

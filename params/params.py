@@ -75,11 +75,13 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
         for attr, value in cls.__dict__.items():
             if attr.startswith("_") or callable(getattr(cls, attr)):
                 continue
-            if isinstance(value, property):
-                continue
-            param_spec = value
-            if not isinstance(param_spec, Param):
+
+            param_spec = getattr(cls, attr)
+            if isinstance(param_spec, property):
+                param_spec = Param(param_spec.fget(cls))
+            elif not isinstance(param_spec, Param):
                 param_spec = Param(value)
+
             param_spec.name = attr
             specs[attr] = param_spec
 
