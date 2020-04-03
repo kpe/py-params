@@ -6,3 +6,4 @@
 from .version import __version__
 
 from .params import Params, Param
+from .with_params import WithParams

@@ -100,6 +100,7 @@ Accessing parameters not defined as class level attributes would raise an ``Attr
 
 NEWS
 ----
+ - **04.Apr.2020** - ``WithParams`` mixin added.
  - **31.Mar.2020** - support for generating ``argparse`` CLI parser. Hierarchy aggregation refactored.
 
 
