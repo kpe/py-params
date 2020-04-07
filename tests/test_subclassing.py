@@ -7,70 +7,93 @@ from __future__ import division, absolute_import, print_function
 
 import unittest
 
-from params import Params
+import params as pp
 
 
-class BaseParams(Params):
-    param_a = True
-    param_b = 1
+class BaseParams(pp.Params):
+    param_a = "a"
+    param_b = "b"
 
 
 class SubParams(BaseParams):
-    param_c = 'a'
-    param_a = False
+    param_a = "Sa"
+    param_c = "Sc"
 
 
 class SubParamsA(SubParams):
-    param_d = 'A'
-    param_e = False
+    param_d = "aD"
+    param_e = "aE"
 
 
 class SubParamsB(SubParams):
-    param_f = 'B'
-    param_g = False
+    param_f = 'SBf'
+
+    @property
+    def param_g(self):
+        return "SBBg_" + self.param_b
+
+    @property
+    def param_a(self):
+        return "SBBa_" + self.param_g + self.param_c
 
 
 class MySubParams(SubParamsA, SubParamsB):
-    param_h = 'a'
-    param_j = False
+    param_h = "MSh"
+    param_j = "MSj"
 
     @property
-    def param_f(self):
-        return 'F'
+    def param_c(self):
+        return "MSc_" + self.param_g
+
+
+class AnotherSubParams(MySubParams):
+    @property
+    def param_h(self):
+        return "ASh_" + self.param_d
+
+    @property
+    def param_g(self):
+        return "ASg_" + self.param_h
+
 
 
 class ParamsSubclassingTest(unittest.TestCase):
     def test_subclassing(self):
-        Params()
         params = SubParams()
-        expected = {'param_a': False, 'param_b': 1, 'param_c': 'a'}
+        expected = {"param_a": "Sa", "param_b": "b", "param_c": "Sc"}
         self.assertEqual(dict(params), expected)
 
-        params = SubParams(param_b=2)
-        params.param_c = 'b'
-        params.param_a = True
-        expected = {'param_a': True, 'param_b': 2, 'param_c': 'b'}
+        params = SubParams(param_b="bb")
+        params.param_c = "cc"
+        params.param_a = "aa"
+        expected = {"param_a": "aa", "param_b": "bb", "param_c": "cc"}
         self.assertEqual(dict(params), expected)
 
         params = BaseParams()
         try:
-            params.param_c = 'c'
+            params.param_c = "cc"
             self.fail()
         except AttributeError:
             pass
 
-        params = SubParams(param_b=2).clone(param_c=3)
-        expected = {'param_b': 2, 'param_a': False, 'param_c': 3}
+        params = SubParams(param_b="bb").clone(param_c="cc")
+        expected = {"param_b": "bb", "param_a": "Sa", "param_c": "cc"}
         self.assertEqual(dict(params), expected)
 
     def test_hierarchy(self):
-        params = MySubParams()
-        self.assertEqual(params.param_b, 1)
-        self.assertEqual(params.param_a, False)
+        params = MySubParams(param_f="SBf")
+        self.assertEqual(params.param_b, "b")
+        self.assertEqual(params.param_a, "SBBa_SBBg_bMSc_SBBg_b")
+
         MySubParams.to_argument_parser().print_help()
 
-        self.assertEqual(params.param_f, "F")
-        self.assertEqual(MySubParams.param_f, "F")
+        self.assertEqual(params.param_f, "SBf")
+        self.assertEqual(MySubParams.param_f, "SBf")
+
+    def test_hierarchy_override(self):
+        params = AnotherSubParams(param_d='Z')
+        self.assertEqual(params.param_g, "ASg_ASh_Z")
+
 
 if __name__ == '__main__':
     unittest.main()

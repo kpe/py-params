@@ -14,7 +14,7 @@ import argparse
 
 class Param:
     """ Provides a parameter specification to be used within a Params instance. """
-    def __init__(self, value, doc: Text = None, dtype: Type = None, required: bool = False):
+    def __init__(self, value, doc: Text = None, dtype: Type = None, required: bool = False, params_class=None):
         """
         Constructs a parameter specification to be used in a Params instance:
 
@@ -31,17 +31,28 @@ class Param:
         :param dtype: (Optional) type
         :param required:  default is True.
         """
-        self.default_value = value
+        self.params_class = params_class
+        self._default_value = value
         self.doc_string = doc
         self.required = required
-        self.dtype = type(value) if (dtype is None and value is not None) else dtype
-        if value is not None:
+        self.dtype = dtype
+        if dtype is None and value is not None and not callable(value):
+            self.dtype = type(value)
+        if value is not None and not callable(value):
             if not isinstance(value, self.dtype):
                 raise RuntimeError(f"Param({value}) does not match dtype:[{self.dtype}]")
         self.name = None
+        self.is_property = callable(value)
+
+    @property
+    def default_value(self):
+        return self._default_value(self.params_class) if self.is_property else self._default_value
+
+    def value(self, params):
+        return self._default_value(params) if self.is_property else getattr(self.name, params)
 
 
-class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
+class Params(dict):
     """ Base class for defining safe parameter dictionaries.
 
     Example:
@@ -67,28 +78,33 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
 
     def __init_subclass__(cls, **kwargs):
         """ Aggregates the Param spec of the parameters over the hierarchy. """
-        specs = {}
-        for base in reversed(cls.__bases__):
+        base_specs = {}
+        for base in cls.__bases__:
             if issubclass(base, Params):
-                specs.update(base.__specs)
+                base_specs.update(base.__specs)
 
+        cls_specs = []  # evaluate in order of declaration
         for attr, value in cls.__dict__.items():
             if attr.startswith("_") or callable(getattr(cls, attr)):
                 continue
 
-            param_spec = getattr(cls, attr)
-            if isinstance(param_spec, property):
-                param_spec = Param(param_spec.fget(cls))
-            elif not isinstance(param_spec, Param):
+            attr_val = getattr(cls, attr)
+            if isinstance(attr_val, property):
+                param_spec = Param(attr_val.fget, params_class=cls)
+            elif not isinstance(attr_val, Param):
                 param_spec = Param(value)
+            else:
+                param_spec = attr_val
 
             param_spec.name = attr
-            specs[attr] = param_spec
+            cls_specs.append((attr, param_spec))
 
-        for attr, value in specs.items():
+        _specs = {}
+        for attr, value in list(base_specs.items()) + cls_specs:
             setattr(cls, attr, value.default_value)
+            _specs[attr] = value
 
-        cls.__specs = specs
+        cls.__specs = _specs
         cls.__defaults = {key: val.default_value for key, val in cls.__specs.items()}
 
     def __init__(self, *args, **kwargs):
@@ -96,8 +112,14 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
         self.update(self.__defaults)   # start with default values
         self.update(dict(*args))       # override with tuple list
         self.update(kwargs)            # override with kwargs
+        # update any overridden @property parameters
+        prop_specs = list(filter(lambda spec: spec.is_property,
+                                 self.__class__.__specs.values()))
 
-    def update(self, arg=None, **kwargs):
+        for spec in prop_specs:
+            self.update({spec.name: spec.value(self)})
+
+    def update(self, arg=None, **kwargs):   # see dict.update()
         if arg:
             keys = getattr(arg, "keys") if hasattr(arg, "keys") else None
             if keys and (inspect.ismethod(keys) or inspect.isbuiltin(keys)):
@@ -111,7 +133,10 @@ class Params(dict):  # TODO use collections.UserDict instead of dict - see #1
 
     def __getattribute__(self, attr):
         if not attr.startswith("_") and attr in self.__defaults:
-            return self.__getitem__(attr)
+            if self.__specs[attr].is_property:
+                return self.__specs[attr].value(self)
+            else:
+                return self.__getitem__(attr)
         return object.__getattribute__(self, attr)
 
     def __setattr__(self, key, value):
