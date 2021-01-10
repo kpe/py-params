@@ -14,7 +14,8 @@ import argparse
 
 class Param:
     """ Provides a parameter specification to be used within a Params instance. """
-    def __init__(self, value, doc: Text = None, dtype: Type = None, required: bool = False, params_class=None):
+    def __init__(self, value, doc: Text = None, dtype: Type = None, required: bool = False,
+                 positional: bool = False, params_class=None):
         """
         Constructs a parameter specification to be used in a Params instance:
 
@@ -30,9 +31,12 @@ class Param:
         :param doc: (Optional) document string
         :param dtype: (Optional) type
         :param required:  default is True.
+        :param positional: defaults to False for making a CLI option argument like --foo. Set to True,
+                           for a positional argument.
         """
         self.params_class = params_class
         self._default_value = value
+        self.positional = positional
         self.doc_string = doc
         self.required = required
         self.dtype = dtype
@@ -233,8 +237,7 @@ class Params(dict):
             return cls.from_dict(lparams, return_instance=True, return_unused=False)
 
     @classmethod
-    @property
-    def _open_file(cls):
+    def _open_file(cls, *args, **kwargs):
         """ Selects an open() implementation.
         Tries to with Tensorflows first (tf.io.gfile.GFile)
         and if not available fall backs to python's default open().
@@ -244,7 +247,7 @@ class Params(dict):
             open_file = tf.io.gfile.GFile  # pragma: no cover
         except Exception:                  # pragma: no cover
             open_file = open
-        return open_file
+        return open_file(*args, **kwargs)
 
     @classmethod
     def from_json_file(cls, json_file, check_params=False):
@@ -309,8 +312,13 @@ class Params(dict):
             result = param_name.lower().replace("_", "-")
             return result
 
+        def sort_positional_args(attribs: dict):
+            res = list(filter(lambda t: t[1].positional, attribs.items()))
+            res += list(filter(lambda t: not t[1].positional, attribs.items()))
+            return res
+
         parser = argparse.ArgumentParser()
-        for attr, spec in cls.__specs.items():
+        for attr, spec in sort_positional_args(cls.__specs):
             if spec.doc_string is None:
                 continue
             name = arg_name(spec.name)
@@ -324,7 +332,11 @@ class Params(dict):
                 add_argument_args.update({
                     "type": _str2bool, "nargs": "?", "const": True
                 })
-            parser.add_argument("--{}".format(name), **add_argument_args)
+            if spec.positional:
+                del add_argument_args['required']
+                parser.add_argument("{}".format(name), **add_argument_args)
+            else:
+                parser.add_argument("--{}".format(name), **add_argument_args)
         return parser
 
 

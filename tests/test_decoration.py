@@ -27,6 +27,10 @@ class MyParams(pp.Params):
         return self.number_of_things + value
 
 
+class MyParamsWithCommand(MyParams):
+    cmd = pp.Param(None, doc="Command to execute", positional=True)
+
+
 class ParamsDecorationTest(unittest.TestCase):
 
     def test_decoration(self):
@@ -71,5 +75,21 @@ class ParamsDecorationTest(unittest.TestCase):
         except Exception:
             pass
 
+    def test_arg_parser_with_command(self):
+        parser = MyParamsWithCommand.to_argument_parser()
+        parser.print_help()
 
+        def error_fn(msg, *args, **kwargs):
+            raise Exception(msg)
+        parser.error = error_fn  # supress sys.exit
+
+        args = parser.parse_args(["start", "--use-other-things", False, "--number-of-things", "7"])
+        self.assertEqual(args.use_other_things, False)
+        inst = MyParamsWithCommand(args._get_kwargs())
+        self.assertEqual(inst.cmd, 'start')
+
+        args = parser.parse_args(["--use-other-things", False, "--number-of-things", "7", "stop"])
+        self.assertEqual(args.use_other_things, False)
+        inst = MyParamsWithCommand(args._get_kwargs())
+        self.assertEqual(inst.cmd, 'stop')
 
