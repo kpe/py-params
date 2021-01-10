@@ -196,22 +196,61 @@ class Params(dict):
         :param check_params: whether to throw an exception when
                json_string contains params not compatible with the current instance.
         """
+        lparams = json.loads(json_string)
         if check_params:
-            return cls(**json.loads(json_string))
+            return cls(**lparams)
         else:
-            return cls.from_dict(json.loads(json_string), return_instance=True, return_unused=False)
+            return cls.from_dict(lparams, return_instance=True, return_unused=False)
+
+    @staticmethod
+    def _check_yaml_import():
+        try:
+            import yaml
+        except Exception:  # pragma: no cover
+            raise ModuleNotFoundError("PyYAML not found. Try installing with: `pip install PyYAML`")  # pragma: no cover
+
+    def to_yaml_string(self):
+        """ Serializes this instance to a YAML string."""
+        Params._check_yaml_import()
+        import yaml
+
+        return yaml.safe_dump(dict(self))
 
     @classmethod
-    def from_json_file(cls, json_file, check_params=False):
-        """Constructs an instance from a json file."""
+    def from_yaml_string(cls, yaml_string: Text, check_params=False):
+        """ Deserializes this instance from a YAML string.
+        :param yaml_string: a YAML string to parse
+        :param check_params: whether to throw an exception when
+               yaml_string contains params not compatible with the current instance.
+        """
+        Params._check_yaml_import()
+        import yaml
+
+        lparams = yaml.safe_load(yaml_string)
+        if check_params:
+            return cls(**lparams)
+        else:
+            return cls.from_dict(lparams, return_instance=True, return_unused=False)
+
+    @classmethod
+    @property
+    def _open_file(cls):
+        """ Selects an open() implementation.
+        Tries to with Tensorflows first (tf.io.gfile.GFile)
+        and if not available fall backs to python's default open().
+        """
         try:
             import tensorflow as tf
             open_file = tf.io.gfile.GFile  # pragma: no cover
         except Exception:                  # pragma: no cover
             open_file = open
+        return open_file
 
+    @classmethod
+    def from_json_file(cls, json_file, check_params=False):
+        """Constructs an instance from a json file."""
         try:
-            with open_file(json_file, "r") as reader:
+            with Params._open_file(json_file, "r") as reader:
                 text = reader.read()
             return cls.from_json_string(text, check_params=check_params)
         except Exception as err:
@@ -221,17 +260,38 @@ class Params(dict):
     def to_json_file(self, file_path, **kwargs):
         """Writes the instance to a json file."""
         try:
-            import tensorflow as tf
-            open_file = tf.io.gfile.GFile  # pragma: no cover
-        except Exception:                  # pragma: no cover
-            open_file = open
-
-        try:
-            with open_file(file_path, "w") as fp:
-                json.dump(self, fp, **kwargs)
+            with Params._open_file(file_path, "w") as fp:
+                json.dump(dict(self), fp, **kwargs)
             return file_path
         except Exception as err:
             print("Failed to write {} instance to: {}".format(self.__class__.__name__, file_path), err)
+            return None
+
+    def to_yaml_file(self, file_path, **kwargs):
+        """Writes the instance to a yaml file."""
+        Params._check_yaml_import()
+        import yaml
+
+        try:
+            with Params._open_file(file_path, "w") as fp:
+                yaml.safe_dump(dict(self), stream=fp, **kwargs)
+            return file_path
+        except Exception as err:
+            print("Failed to write {} instance to: {}".format(self.__class__.__name__, file_path), err)
+            return None
+
+    @classmethod
+    def from_yaml_file(cls, yaml_file, check_params=False):
+        """Constructs an instance from a yaml file."""
+        Params._check_yaml_import()
+        import yaml
+
+        try:
+            with Params._open_file(yaml_file, "r") as reader:
+                text = reader.read()
+            return cls.from_yaml_string(text, check_params=check_params)
+        except Exception as err:
+            print("Failed to read {} instance from: {}".format(cls.__name__, yaml_file), err)
             return None
 
     def clone(self, **kwargs):

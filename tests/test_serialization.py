@@ -57,6 +57,33 @@ class ParamsSerializationTest(unittest.TestCase):
         except Exception:
             pass
 
+    def test_yaml(self):
+        params = SomeParams.from_yaml_string(SomeParams().to_yaml_string())
+        self.assertEqual(params, {'param_a': 1})
+
+    def test_to_yaml_file(self):
+        params = SomeParams.from_yaml_string(SomeParams().to_yaml_string())
+        with tempfile.NamedTemporaryFile("w") as tf:
+            tf.close()
+            file_name = params.to_yaml_file(tf.name)
+            self.assertIsNotNone(file_name)
+            dparams = SomeParams.from_yaml_file(file_name)
+            self.assertEqual(params, dparams)
+            dparams = SomeParams.from_yaml_file(file_name, check_params=True)
+            self.assertEqual(params, dparams)
+
+    def test_to_yaml_file_fail(self):
+        params = SomeParams.from_yaml_string(SomeParams().to_yaml_string())
+        try:
+            params.to_yaml_file("/proc/test")
+            self.fail()
+        except Exception:
+            pass
+        try:
+            SomeParams.from_yaml_file("/proc/test")
+            self.fail()
+        except Exception:
+            pass
 
 if __name__ == '__main__':
     unittest.main()
