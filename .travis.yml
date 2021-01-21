@@ -42,7 +42,7 @@ notifications:
   
 deploy:
   provider: pypi
-  username: kpe
+  username: "__token__"
   password:
     secure: MU36ky4Y0ZDVQW6muXsakFR2reiv+9N/FForzSrjDFgaUMi1Q0VdyRXkiBJQYq13XeKhd216FPNrjZKB8jGArj7MdfLh6/kKGgwng6Vq0zU3oVo8DcnOZ9/uzsA9WtziGhk33xFWxGrbhkXAOBfoIpppUp6RfKIix2s2zDY+RFe3J32DRwsqYLB1rgOQ038RyBsW1HMdc6NXey5iEqoG/nde9vyl7S4BT+B8dS8BfCQWEqnfTSEI1Y9bFHH7x/ym5cwX94UYsxgadQj0Id5+vbO2zH3Xv2DEYtdS7AmCfRt3Gt2WQND7cJijl+Mf+DPj0c/+IdATeh83CWNVZ9MI5MrhZorkkW5uj4Jn8aBC2g90t3ZRVBTnFGk1+hkmmhfKB8OpmpKI8GWC0+XMhjGmFaQGKN7XUxWMXpA71NPmO0hrYJ3wTrX795dkKZdYFo6a5Ca9G9JVzsVOyZoi0l0TL0xH++wZsXYrOcnN9O5DgGjS/iKT8EH0rGKWSp+Tvvl6w8UaH2hHA0qkMa+k3uKqRCC+RYntyTyrsMZy8mCDHsw58Uk5+IUqUIpYPlAqIxc0UWzrW3XfL8Ljdy7sboaIwZAgIy6IjQdxdlvu7c47VlytQuLxWfnbW/Ynxos7TburBsdZl6dSnMy98l7zn1jbFNBcMtlK61FKoTfgyyNnT6Q=
   on:
