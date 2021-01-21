@@ -88,8 +88,8 @@ Accessing parameters not defined as class level attributes would raise an ``Attr
     {'number_of_things': 7, 'use_feature_x': True}
 
 
-.. |Build Status| image:: https://travis-ci.org/kpe/py-params.svg?branch=master
-   :target: https://travis-ci.org/kpe/py-params
+.. |Build Status| image:: https://travis-ci.com/kpe/py-params.svg?branch=master
+   :target: https://travis-ci.com/kpe/py-params
 .. |Coverage Status| image:: https://coveralls.io/repos/kpe/py-params/badge.svg?branch=master
    :target: https://coveralls.io/r/kpe/py-params
 .. |Version Status| image:: https://badge.fury.io/py/py-params.svg
